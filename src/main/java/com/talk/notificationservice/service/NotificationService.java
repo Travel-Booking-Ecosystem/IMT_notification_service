@@ -42,11 +42,12 @@ public class NotificationService {
     }
 
     public void createFriendRequestAcceptedNotification(FriendRequestAcceptedEvent event) {
+        // create notification for friend request sender to notify that his/her friend request is accepted
         Notification notification = Notification.builder()
-                .userId(event.getReceiverId())
-                .image(event.getSender().getAvatar())
-                .title(event.getSender().getDisplayName())
-                .content(event.getSender().getDisplayName() + " accepted your friend request")
+                .userId(event.getSenderId())
+                .image(event.getReceiver().getAvatar())
+                .title(event.getReceiver().getDisplayName())
+                .content(event.getReceiver().getDisplayName() + " accepted your friend request")
                 .unread(true)
                 .createdAt(LocalDateTime.now())
                 .build();
@@ -59,11 +60,12 @@ public class NotificationService {
     }
 
     public void createFriendGroupMessageRepliedNotification(GroupMessageRepliedEvent event) {
+        // send notification to the sender of the message whose being replied to
         Notification notification = Notification.builder()
-                .userId(event.getSender().getId())
-                .image(event.getSender().getAvatar())
-                .title(event.getSender().getDisplayName())
-                .content(event.getSender().getDisplayName() + " replied to your message")
+                .userId(event.getMessage().getSenderId())
+                .image(event.getConversation().getAvatar())
+                .title(event.getConversation().getName())
+                .content(event.getReplier().getDisplayName() + " replied to your message")
                 .unread(true)
                 .createdAt(LocalDateTime.now())
                 .build();
