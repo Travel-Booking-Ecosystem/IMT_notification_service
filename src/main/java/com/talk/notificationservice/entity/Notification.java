@@ -29,6 +29,7 @@ public class Notification {
     private LocalDateTime createdAt;
     public enum NotificationType {
         //TODO: seen message notification (only for current conversation)
-        FRIEND_REQUEST_ACCEPTED
+        FRIEND_REQUEST_ACCEPTED,
+        NEW_MESSAGE_REACTION,
     }
 }

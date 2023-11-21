@@ -2,6 +2,7 @@ package com.talk.notificationservice.config;
 
 import com.talk.notificationservice.events.FriendRequestAcceptedEvent;
 import com.talk.notificationservice.events.GroupMessageRepliedEvent;
+import com.talk.notificationservice.events.NewMessageReactionEvent;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -53,7 +54,8 @@ public class KafkaConsumerConfig {
     private void addTypeMapping(Map<String, Object> props) {
         Class[] subscribedEventClasses = {
                 FriendRequestAcceptedEvent.class,
-                GroupMessageRepliedEvent.class
+                GroupMessageRepliedEvent.class,
+                NewMessageReactionEvent.class,
         };
 
         String typeMapping = "";

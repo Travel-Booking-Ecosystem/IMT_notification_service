@@ -2,6 +2,7 @@ package com.talk.notificationservice.listener;
 
 import com.talk.notificationservice.events.FriendRequestAcceptedEvent;
 import com.talk.notificationservice.events.GroupMessageRepliedEvent;
+import com.talk.notificationservice.events.NewMessageReactionEvent;
 import com.talk.notificationservice.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,10 +31,16 @@ public class AppEventListener {
     }
 
     @KafkaListener(topics = GROUP_MESSAGE_REPLIED_TOPIC, containerFactory = "appEventKafkaListenerContainerFactory")
-
     public void handleGroupMessageRepliedEvent(ConsumerRecord<String, GroupMessageRepliedEvent> record) {
         log.info("Handling new group message replied event");
         GroupMessageRepliedEvent event = record.value();
         notificationService.createFriendGroupMessageRepliedNotification(event);
+    }
+
+    @KafkaListener(topics = "new-message-reaction", containerFactory = "appEventKafkaListenerContainerFactory")
+    public void handleNewMessageReactionEvent(ConsumerRecord<String, NewMessageReactionEvent> record) {
+        log.info("Handling new message reaction event");
+        NewMessageReactionEvent event = record.value();
+        notificationService.createNewMessageReactionNotification(event);
     }
 }

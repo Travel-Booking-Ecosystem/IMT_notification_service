@@ -6,14 +6,17 @@ import com.talk.notificationservice.dto.response.NotificationDTO;
 import com.talk.notificationservice.entity.Notification;
 import com.talk.notificationservice.events.FriendRequestAcceptedEvent;
 import com.talk.notificationservice.events.GroupMessageRepliedEvent;
+import com.talk.notificationservice.events.NewMessageReactionEvent;
 import com.talk.notificationservice.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class NotificationService {
@@ -72,6 +75,28 @@ public class NotificationService {
 
         notificationRepository.save(notification);
 
+        // produce NEW_NOTIFICATION event to Kafka
+        kafkaProducerService.sendNewNotificationEvent(notification);
+    }
+
+    public void createNewMessageReactionNotification(NewMessageReactionEvent event) {
+        // if the reaction is unreact, don't create notification
+        if (event.getMessageReaction().isUnReact()) return;
+
+        // send notification to the sender of the message whose being reacted to
+        Notification notification = Notification.builder()
+                        .userId(event.getMessageReaction().getMessageOwnerId())
+                                .image(event.getMessageReaction().getConversation().getConversationAvatar())
+                                        .title(event.getMessageReaction().getConversation().getConversationName())
+                                                .content(event.getMessageReaction().getReactionInformation().getReactorName() + " reacted to your message")
+                                                        .unread(true)
+                                                                .createdAt(LocalDateTime.now())
+                                                                        .build();
+
+
+        notificationRepository.save(notification);
+
+        log.info("Notification: {}", notification);
         // produce NEW_NOTIFICATION event to Kafka
         kafkaProducerService.sendNewNotificationEvent(notification);
     }
