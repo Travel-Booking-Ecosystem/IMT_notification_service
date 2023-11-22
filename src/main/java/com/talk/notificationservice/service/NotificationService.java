@@ -81,17 +81,19 @@ public class NotificationService {
 
     public void createNewMessageReactionNotification(NewMessageReactionEvent event) {
         // if the reaction is unreact, don't create notification
-        if (event.getMessageReaction().isUnReact()) return;
+        NewMessageReactionEvent.MessageReactionDTO messageReaction = event.getMessageReaction();
+        if (messageReaction.isUnReact()) return;
 
         // send notification to the sender of the message whose being reacted to
+        NewMessageReactionEvent.Conversation conversation = messageReaction.getConversation();
         Notification notification = Notification.builder()
-                        .userId(event.getMessageReaction().getMessageOwnerId())
-                                .image(event.getMessageReaction().getConversation().getConversationAvatar())
-                                        .title(event.getMessageReaction().getConversation().getConversationName())
-                                                .content(event.getMessageReaction().getReactionInformation().getReactorName() + " reacted to your message")
-                                                        .unread(true)
-                                                                .createdAt(LocalDateTime.now())
-                                                                        .build();
+                        .userId(messageReaction.getMessageOwnerId())
+                        .image(conversation.getConversationAvatar())
+                        .title(conversation.getConversationName())
+                        .content(messageReaction.getReactionInformation().getReactorName() + " reacted to your message")
+                        .unread(true)
+                        .createdAt(LocalDateTime.now())
+                        .build();
 
 
         notificationRepository.save(notification);
